@@ -21,9 +21,11 @@
 #ifndef CameraC328R_h
 #define CameraC328R_h
 
-#include "WProgram.h"
-#include "WConstants.h"
+#include "Arduino.h"
+
 #include <inttypes.h>
+//#include <SoftwareSerial.h>
+
 
 // The byte size of commands
 #define CMD_SIZE 6
@@ -55,9 +57,11 @@
 // Maximum allowed errors when reading picture data
 #define MAX_ERRORS 15
 
+
 /**
  * Provides a driver interface to the C328R camera from COMedia Ltd.
  */
+class SoftwareSerial;
 class CameraC328R
 {
   public:
@@ -115,8 +119,9 @@ class CameraC328R
       BAUD57600 = 0x1F,
       BAUD115200 = 0x0F
     };
-
-    CameraC328R( const HardwareSerial& = Serial);
+	
+	CameraC328R(SoftwareSerial *softSerial = NULL);
+	
     bool sync();
     bool reset( bool );
     bool powerOff();
@@ -129,7 +134,7 @@ class CameraC328R
     bool getRawPicture( PictureType, byte[], uint16_t&, uint16_t );
 
   private:
-    HardwareSerial _serial;
+	SoftwareSerial *_serialPort;
     uint16_t _packageSize;
     byte _command[CMD_SIZE];
     byte _receive_cmd[CMD_SIZE];
@@ -141,6 +146,10 @@ class CameraC328R
     void sendACK( const byte, uint16_t );
     void sendACK( const byte );
     bool getPicture( PictureType, uint16_t, uint16_t& );
+	void serial_flush(void);
+	uint8_t serial_available(void);
+	void serial_print(uint8_t);
+	int serial_read(void);
 };
 
 #endif
